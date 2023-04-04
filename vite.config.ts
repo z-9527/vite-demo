@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { autoRouter } from "./vite.plugins";
+import pxtorem from "postcss-pxtorem";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -27,5 +28,21 @@ export default defineConfig({
       },
     },
     cssCodeSplit: false,
+  },
+  css: {
+    postcss: {
+      plugins: [
+        pxtorem({
+          rootValue: 16,
+          unitPrecision: 5,
+          propList: ["*"],
+          selectorBlackList: [],
+          replace: true,
+          mediaQuery: false,
+          minPixelValue: 0,
+          exclude: /node_modules/i,
+        }),
+      ],
+    },
   },
 });
