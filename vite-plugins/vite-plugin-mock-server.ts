@@ -1,14 +1,15 @@
 import type { Plugin } from "vite";
 import path from "path";
 import fs from "fs";
-
+import url from "url";
+import bodyParser from "body-parser";
 
 const rootDir = process.cwd();
 
 // 清除缓存
 async function importFresh(modulePath) {
-  const cacheBustingModulePath = `${modulePath}?update=${Date.now()}`
-  return (await import(cacheBustingModulePath)).default
+  const cacheBustingModulePath = `${modulePath}?update=${Date.now()}`;
+  return (await import(cacheBustingModulePath)).default;
 }
 
 async function getFilesSync(filePath, result) {
@@ -29,6 +30,27 @@ async function getFilesSync(filePath, result) {
   }
 }
 
+/**
+ * 参照express封装
+ * @param req
+ * @param res
+ */
+function createContext(req, res) {
+  Object.assign(req, {
+    query: url.parse(req.url, true).query,
+  });
+  Object.assign(res, {
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(obj) {
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(obj));
+    },
+  });
+}
+
 function proxyApi(apiMap, req, res, next) {
   const method = req.method.toLowerCase();
   const baseUrl = req._parsedUrl.pathname;
@@ -39,6 +61,7 @@ function proxyApi(apiMap, req, res, next) {
     if (_method === method && api === baseUrl) {
       if (typeof handle === "function") {
         // 可以参照koa或者express的方法封装一下res,这样外面在使用时更方便
+        createContext(req, res);
         handle(req, res);
       } else {
         res.writeHead(200, {
@@ -52,17 +75,20 @@ function proxyApi(apiMap, req, res, next) {
   next();
 }
 
-
-export default function mockServer():Plugin{
+export default function mockServer(): Plugin {
   return {
-    name:'mock-server',
+    name: "mock-server",
     async configureServer(server) {
+      // parse application/x-www-form-urlencoded
+      server.middlewares.use(bodyParser.urlencoded({ extended: false }));
+      // parse application/json
+      server.middlewares.use(bodyParser.json());
+
       server.middlewares.use(async function (req, res, next) {
         const apiMap = {};
         await getFilesSync(path.join(rootDir, "mock"), apiMap);
         proxyApi(apiMap, req, res, next);
       });
-      
     },
-  }
+  };
 }

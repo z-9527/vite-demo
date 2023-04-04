@@ -1,30 +1,25 @@
-import url from "url";
-
 export default {
   "/api/test": (req, res) => {
-    const urlObj = url.parse(req.url, true);
-    const { name, age } = urlObj.query;
-    res.end(
-      JSON.stringify({
-        success: true,
-        data: {
-          name,
-          age,
-        },
-      })
-    );
+    const { name, age } = req.query;
+    res.json({
+      success: true,
+      data: {
+        name,
+        age,
+      },
+    });
   },
   "POST /api/test2": (req, res) => {
-    const urlObj = url.parse(req.url, true);
-    const { name, age } = urlObj.query;
-    res.end(
-      JSON.stringify({
-        success: true,
-        data: {
-          name,
-          age,
-        },
-      })
-    );
+    const body = req.body;
+    res.json({
+      success: true,
+      data: body,
+    });
+  },
+  "/api/test3": (req, res) => {
+    res.status(401).json({
+      success: false,
+      message: "暂无权限",
+    });
   },
 };
