@@ -11,4 +11,21 @@ export default defineConfig({
       "@": path.resolve("src"),
     },
   },
+  base: "./",
+  server: {
+    port: 8000,
+  },
+  preview: {
+    open: true,
+    port: 8888,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: "assets/[name][extname]",
+        entryFileNames: "[name].js",
+      },
+    },
+    cssCodeSplit: false,
+  },
 });
