@@ -14,6 +14,9 @@ export function autoRouter(): Plugin {
       await createRoute(pagesDir, result, declarations);
 
       let code = `
+/**
+ * vite插件自动生成
+ */
 import React from "react";
 import { RouteObject } from "react-router-dom";
 
@@ -77,13 +80,16 @@ async function createRoute(filePath, config, declarations) {
               node.declaration?.name || node.declaration?.id?.name;
           }
         });
-        route.path =
-          "/" + path.relative(path.join(__dirname, "src/pages"), filePath);
+        const relativePath = path.relative(
+          path.join(__dirname, "src/pages"),
+          filePath
+        );
+        route.path = "/" + relativePath;
         route.element = `<${componentName} />`;
         config.push(route);
         declarations.push({
           key: componentName,
-          value: `React.lazy(() => import("./${route.path}"))`,
+          value: `React.lazy(() => import("./${relativePath}"))`,
         });
       }
       for await (let item of filePaths) {
