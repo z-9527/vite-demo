@@ -4,11 +4,13 @@ import fs from "fs";
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
 
-export function autoRouter(): Plugin {
+const rootDir = process.cwd();
+
+export default function autoRouter(): Plugin {
   return {
     name: "react-auto-router",
     buildStart: async () => {
-      const pagesDir = path.join(__dirname, "src/pages");
+      const pagesDir = path.join(rootDir, "src/pages");
       const result = [];
       const declarations = [];
       await createRoute(pagesDir, result, declarations);
@@ -81,7 +83,7 @@ async function createRoute(filePath, config, declarations) {
           }
         });
         const relativePath = path.relative(
-          path.join(__dirname, "src/pages"),
+          path.join(rootDir, "src/pages"),
           filePath
         );
         route.path = "/" + relativePath;

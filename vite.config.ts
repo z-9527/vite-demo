@@ -1,12 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { autoRouter } from "./vite.plugins";
+import autoRouter from "./vite-plugins/vite-plugin-react-auto-router";
+import mockServer from "./vite-plugins/vite-plugin-mock-server";
 import pxtorem from "postcss-pxtorem";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), autoRouter()],
+  plugins: [react(), autoRouter(), mockServer()],
   resolve: {
     alias: {
       "@": path.resolve("src"),
