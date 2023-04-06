@@ -11,16 +11,32 @@ export default function autoRouter(): Plugin {
     name: "react-auto-router",
     buildStart: async () => {
       const pagesDir = path.join(rootDir, "src/pages");
-      const result = [];
+      const result: any = [];
       const declarations = [];
-      await createRoute(pagesDir, result, declarations);
+      const comment: any = {};
+      await createRoute(pagesDir, result, declarations, comment);
+      if (comment.indexPage) {
+        result.push({
+          path: "/",
+          element: `<Redirect to='${comment.indexPage}' />`,
+        });
+      }
 
       let code = `
 /**
  * vite插件自动生成
  */
-import React from "react";
-import { RouteObject } from "react-router-dom";
+import React, { useEffect } from "react";
+import { RouteObject, useNavigate } from "react-router-dom";
+
+
+function Redirect({ to }: { to: string }) {
+  let navigate = useNavigate();
+  useEffect(() => {
+    navigate(to);
+  });
+  return null;
+}
 
 `;
       declarations.forEach((item) => {
@@ -63,8 +79,9 @@ function parseFile(filePath, callback) {
  * @param filePath 路由文件目录
  * @param config 路由配置
  * @param declaration 声明路由组件
+ * @param comment 路由注释信息
  */
-async function createRoute(filePath, config, declarations) {
+async function createRoute(filePath, config, declarations, comment) {
   try {
     const stats = fs.statSync(filePath);
     if (stats.isDirectory() && !filePath.includes("components")) {
@@ -75,17 +92,23 @@ async function createRoute(filePath, config, declarations) {
         children: [],
       };
       if (filePaths.includes("index.tsx")) {
+        const relativePath = path.relative(
+          path.join(rootDir, "src/pages"),
+          filePath
+        );
         let componentName = "";
         parseFile(path.join(filePath, "index.tsx"), (node) => {
           if (node.type === "ExportDefaultDeclaration") {
             componentName =
               node.declaration?.name || node.declaration?.id?.name;
           }
+          if (
+            !comment.indexPage &&
+            node.leadingComments?.some((item) => item.value?.includes("@index"))
+          ) {
+            comment.indexPage = "/" + relativePath;
+          }
         });
-        const relativePath = path.relative(
-          path.join(rootDir, "src/pages"),
-          filePath
-        );
         route.path = "/" + relativePath;
         route.element = `<${componentName} />`;
         config.push(route);
@@ -99,7 +122,8 @@ async function createRoute(filePath, config, declarations) {
         await createRoute(
           itemFilePath,
           route.path ? route.children : config,
-          declarations
+          declarations,
+          comment
         );
       }
     }
