@@ -16,7 +16,12 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.(js|ts|tsx|jsx)": "eslint --fix"
+    "*.(js|ts|tsx|jsx)": "eslint src --fix"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -25,6 +30,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
+    "@commitlint/cli": "^17.5.1",
+    "@commitlint/config-conventional": "^17.4.4",
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
