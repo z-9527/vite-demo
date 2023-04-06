@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRoutes } from "react-router-dom";
 import routes from "./pages/routes";
 import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   const config = useRoutes(routes);
   return (
     <div className="App">
