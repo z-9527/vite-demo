@@ -1,27 +1,27 @@
 import { useEffect } from "react";
+import * as services from "@/services/invoices";
 
 export default function Invoices() {
   useEffect(() => {
-    fetch("/api/test?name=1&age=2")
-      .then((res) => {
-        return res.json();
-      })
+    services
+      .getData({ name: "test", age: 2 })
       .then((res) => {
         console.log("res: ", res);
-      });
-    fetch("/api/test2", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ age: 1, name: "2" }),
-    })
-      .then((res) => {
-        return res.json();
       })
-      .then((res) => {
-        console.log("res: ", res);
+      .catch((er) => {
+        console.log("er: ", er);
       });
+    // services.getData2({ name: "test", age: 2 }).then((res) => {
+    //   console.log("res2: ", res);
+    // });
+    // services
+    //   .getError()
+    //   .then((res) => {
+    //     console.log("res3: ", res);
+    //   })
+    //   .catch((err) => {
+    //     console.log("err: ", err);
+    //   });
   }, []);
 
   return (
