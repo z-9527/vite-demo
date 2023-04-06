@@ -22,7 +22,7 @@ export default function autoRouter(): Plugin {
         });
       }
 
-      let code = `
+      let code = `/* eslint-disable */
 /**
  * vite插件自动生成
  */
@@ -31,7 +31,7 @@ import { RouteObject, useNavigate } from "react-router-dom";
 
 
 function Redirect({ to }: { to: string }) {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   useEffect(() => {
     navigate(to);
   });
@@ -117,7 +117,7 @@ async function createRoute(filePath, config, declarations, comment) {
           value: `React.lazy(() => import("./${relativePath}"))`,
         });
       }
-      for await (let item of filePaths) {
+      for await (const item of filePaths) {
         const itemFilePath = path.join(filePath, item);
         await createRoute(
           itemFilePath,
